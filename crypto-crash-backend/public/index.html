@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crypto Crash Game</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 50px; }
+    h1 { font-size: 48px; }
+    #multiplier { font-size: 60px; color: green; }
+    #status { font-size: 24px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Crypto Crash Game</h1>
+  <div id="multiplier">1.00x</div>
+  <div id="status">Waiting for next round...</div>
+
+  <script>
+    const multiplierEl = document.getElementById('multiplier');
+    const statusEl = document.getElementById('status');
+
+    const socket = new WebSocket(`ws://${location.host}`);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'start') {
+        multiplierEl.textContent = '1.00x';
+        statusEl.textContent = 'Game started!';
+        multiplierEl.style.color = 'green';
+      }
+
+      if (data.type === 'multiplier') {
+        multiplierEl.textContent = data.multiplier.toFixed(2) + 'x';
+      }
+
+      if (data.type === 'crash') {
+        multiplierEl.style.color = 'red';
+        statusEl.textContent = `💥 Crashed at ${data.crashPoint.toFixed(2)}x!`;
+      }
+    };
+  </script>
+</body>
+</html>
