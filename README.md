@@ -1,70 +1,145 @@
-# Getting Started with Create React App
+# Crypto Crash Game Backend
+Description : A real-time multiplayer backend for a crypto crash game, featuring WebSocket communication, MongoDB integration, and live cryptocurrency pricing.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Table of Contents
 
-## Available Scripts
+- [Setup Instructions](#setup-instructions)
+- [API Endpoints](#api-endpoints)
+- [WebSocket Events](#websocket-events)
+- [Provably Fair Algorithm](#provably-fair-algorithm)
+- [USD-to-Crypto Conversion Logic](#usd-to-crypto-conversion-logic)
+- [Game Logic & Architecture](#game-logic--architecture)
+- [License](#license)
 
-In the project directory, you can run:
+## Setup Instructions
 
-### `npm start`
+### Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Node.js (v22.15.0 or higher)
+- MongoDB
+- npm
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Installation
 
-### `npm test`
+1. Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   git clone https://github.com/yourusername/crypto-crash-backend.git
+   cd crypto-crash-backend
 
-### `npm run build`
+2. Install dependencies:
+   npm install
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Configure environment variables:
+   
+   PORT=5000
+   MONGODB_URI=mongodb://localhost:27017/cryptocrash
+   CRYPTO_API_KEY=your_api_key_here
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Start the server:
+  npm run dev
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+### 5. API Endpoints
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```markdown
+## API Endpoints
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### POST /api/user/register
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Registers a new user.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+**Request Body:**
 
-## Learn More
+```json
+{
+  "username": "exampleUser",
+  "password": "securePassword"
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Reponse
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": "userId",
+    "username": "exampleUser",
+    "balance": 0
+  }
+}
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+POST /api/user/login
+Authenticates a user and returns a JWT token.
+{
+  "username": "exampleUser",
+  "password": "securePassword"
+}
 
-### Analyzing the Bundle Size
+{
+  "message": "Login successful",
+  "token": "jwtToken"
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 6. WebSocket Events
 
-### Advanced Configuration
+```markdown
+## WebSocket Events
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- `connection`: Triggered when a client connects.
+- `update`: Sends current multiplier.
 
-### Deployment
+  **Payload:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+  ```json
+  {
+    "multiplier": 1.25
+  }
 
-### `npm run build` fails to minify
+# Payload
+{
+  "multiplier": 2.75
+}
+cashout: Client cashes out.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Payload:
+{
+  "username": "exampleUser"
+}
+
+cashed_out: Server response upon successful cashout.
+
+Payload:
+{
+  "winnings": 150
+}
+
+
+### 7. Provably Fair Algorithm
+
+```markdown
+## Provably Fair Algorithm
+
+The crash point is determined using a random number generator. To ensure fairness, a hash-based provably fair system using HMAC or SHA-256 seeds from both server and client can be incorporated. This allows players to verify the integrity of each game's outcome.
+
+
+## USD-to-Crypto Conversion Logic
+
+The server fetches real-time crypto prices using an external API like CoinGecko or TwelveData. User-entered USD values are converted to crypto based on the latest fetched price at the time of betting.
+
+## Game Logic & Architecture
+
+- The server initiates a new game every 10 seconds.
+- Multiplier updates are broadcasted in real-time to all connected clients via WebSockets.
+- Players can place bets and cash out at any point before the game crashes.
+- The crash point is determined randomly or upon reaching a cap value.
+- MongoDB is used for persistent user data storage.
+- WebSocket ensures low-latency communication between the server and clients.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
